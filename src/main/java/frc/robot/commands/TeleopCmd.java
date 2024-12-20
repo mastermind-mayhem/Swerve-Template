@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,6 +25,7 @@ public class TeleopCmd extends Command {
     driveSub = drives;
     this.fieldOrient = fieldOrient;
     addRequirements(driveSub);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -40,6 +45,22 @@ public class TeleopCmd extends Command {
         MathUtil.applyDeadband(
             -controller.getRawAxis(DriveConstants.kDriveRotate), DriveConstants.deadzoneDriver);
 
+    // If statements shifted to here so that every time execute runs (20 times a second) so that it
+    // gets a fresh value to hand in
+    switch (driveSub.getDropDown()) {
+      case DriveConstants.high:
+        speedDrive = DriveConstants.kSpeedHighDrive;
+        speedTurn = DriveConstants.kSpeedHighTurn;
+
+      case DriveConstants.low:
+        speedDrive = DriveConstants.kSpeedSlowDrive;
+        speedTurn = DriveConstants.kSpeedSlowTurn;
+
+      case DriveConstants.medium:
+      default:
+        speedDrive = DriveConstants.kMaxSpeedMetersPerSecond;
+        speedTurn = DriveConstants.kMaxAngularSpeed;
+    }
     if (!fieldOrient.get()) {
       driveSub.fieldDrive(ContY, ContX, ContRotate, speedTurn, speedDrive);
     } else {
